@@ -2,6 +2,15 @@
 
 **Snub** is a minimal macOS utility application that provides a simple interface to toggle your system microphone on/off. The app features a clean floating window with a single microphone icon that you can click to instantly mute or unmute your microphone.
 
+## Screenshots
+
+<div align="center">
+  <img src="screenshots/screenshot_001.png" alt="Snub microphone toggle window - unmuted state" width="300">
+  <img src="screenshots/screenshot_002.png" alt="Snub microphone toggle window - muted state" width="300">
+  
+  *Snub's minimal floating window showing unmuted (left) and muted (right) states*
+</div>
+
 ## Features
 
 - **🎤 One-Click Microphone Toggle** - Single click to mute/unmute your system microphone
