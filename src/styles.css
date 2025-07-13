@@ -1,0 +1,307 @@
+/* ==========================================================================
+   CSS Custom Properties (CSS Variables)
+   ========================================================================== */
+
+:root {
+  /* Typography */
+  --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+  --line-height-base: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+
+  /* Colors - Light theme */
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #6e6e73;
+  --color-background: #f5f5f7;
+  --color-background-glass: rgba(255, 255, 255, 0.1);
+  --color-border-glass: rgba(255, 255, 255, 0.2);
+  --color-close-button: rgba(0, 0, 0, 0.2);
+  --color-close-button-hover: rgba(0, 0, 0, 0.3);
+
+  /* Colors - Microphone states */
+  --color-mic-active: #007aff;
+  --color-mic-muted: #ff3b30;
+  --color-mic-shadow-active: rgba(0, 122, 255, 0.3);
+  --color-mic-shadow-muted: rgba(255, 59, 48, 0.3);
+  --color-mic-shadow-active-hover: rgba(0, 122, 255, 0.4);
+  --color-mic-shadow-muted-hover: rgba(255, 59, 48, 0.4);
+
+  /* Colors - Interactive elements */
+  --color-close-danger: rgba(255, 59, 48, 0.9);
+  --color-white: white;
+  --color-close-icon: #666;
+
+  /* Spacing */
+  --spacing-xs: 10px;
+  --spacing-sm: 16px;
+  --spacing-md: 20px;
+
+  /* Sizes */
+  --size-mic-button: 40px;
+  --size-mic-icon: 32px;
+  --size-close-button: 20px;
+  --size-close-icon: 12px;
+
+  /* Border radius */
+  --border-radius-round: 50%;
+  --border-radius-large: 20px;
+
+  /* Shadows */
+  --shadow-mic-normal: 0 4px 12px;
+  --shadow-mic-hover: 0 6px 16px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+
+  /* Z-index */
+  --z-index-close-button: 1000;
+
+  /* Typography rendering */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-system);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  position: relative;
+  background: transparent;
+  border-radius: var(--border-radius-large);
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   App Layout - Block: app
+   ========================================================================== */
+
+.app {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  background: var(--color-background-glass);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--color-border-glass);
+  position: relative;
+}
+
+.app--draggable {
+  cursor: move;
+}
+
+/* ==========================================================================
+   App Header - Block: app-header
+   ========================================================================== */
+
+.app-header {
+  position: relative;
+  z-index: var(--z-index-close-button);
+}
+
+/* ==========================================================================
+   Microphone Control - Block: mic-control
+   ========================================================================== */
+
+.mic-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Microphone Button - Element: mic-control__button */
+.mic-control__button {
+  width: var(--size-mic-button);
+  height: var(--size-mic-button);
+  border-radius: var(--border-radius-round);
+  border: none;
+  background: var(--color-mic-active);
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-mic-normal) var(--color-mic-shadow-active);
+}
+
+.mic-control__button:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-mic-hover) var(--color-mic-shadow-active-hover);
+}
+
+.mic-control__button:active {
+  transform: scale(0.95);
+}
+
+/* Microphone Button Modifier: muted state */
+.mic-control__button--muted {
+  background: var(--color-mic-muted);
+  box-shadow: var(--shadow-mic-normal) var(--color-mic-shadow-muted);
+}
+
+.mic-control__button--muted:hover {
+  box-shadow: var(--shadow-mic-hover) var(--color-mic-shadow-muted-hover);
+}
+
+/* Microphone Icon - Element: mic-control__icon */
+.mic-control__icon {
+  width: var(--size-mic-icon);
+  height: var(--size-mic-icon);
+  transition: opacity var(--transition-fast);
+}
+
+/* Microphone Icon Modifier: hidden state */
+.mic-control__icon--hidden {
+  display: none;
+}
+
+/* Microphone Status Text - Element: mic-control__status */
+.mic-control__status {
+  margin: 0;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================================================
+   Close Button - Block: close-btn
+   ========================================================================== */
+
+.close-btn {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  width: var(--size-close-button);
+  height: var(--size-close-button);
+  border: none;
+  background: var(--color-close-button);
+  color: var(--color-close-icon);
+  border-radius: var(--border-radius-round);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-index-close-button);
+  transition: all var(--transition-fast);
+  opacity: 0;
+  pointer-events: auto;
+  transform: scale(0.8);
+}
+
+/* Close Button Icon - Element: close-btn__icon */
+.close-btn__icon {
+  width: var(--size-close-icon);
+  height: var(--size-close-icon);
+  pointer-events: none;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Close Button Modifier: visible state */
+.close-btn--visible {
+  opacity: 1;
+  transform: scale(1);
+  background: var(--color-close-button-hover);
+}
+
+/* Close Button Modifier: hover state */
+.close-btn--hover {
+  background: var(--color-close-danger) !important;
+  color: var(--color-white);
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* Close Button Modifier: active state */
+.close-btn--active {
+  transform: scale(0.9);
+}
+
+/* Show close button only when cursor is in window body */
+body:hover .close-btn {
+  opacity: 1;
+  transform: scale(1);
+  background: var(--color-close-button-hover);
+}
+
+.close-btn:hover {
+  background: var(--color-close-danger) !important;
+  color: var(--color-white);
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.close-btn:active {
+  transform: scale(0.9);
+}
+
+/* ==========================================================================
+   Dark Theme Support
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark theme color overrides */
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #a1a1a6;
+    --color-background: transparent;
+    --color-background-glass: rgba(0, 0, 0, 0.5);
+    --color-border-glass: rgba(255, 255, 255, 0.1);
+    --color-close-button: rgba(255, 255, 255, 0.2);
+    --color-close-button-hover: rgba(255, 255, 255, 0.3);
+    --color-close-icon: #ccc;
+  }
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.u-hidden {
+  display: none !important;
+}
+
+.u-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
