@@ -2,7 +2,12 @@ use crate::modules::audio::macos_audio;
 use crate::modules::errors::log_error;
 use crate::modules::menu::emit_state_change;
 use crate::modules::tray;
-use crate::modules::types::MicrophoneState;
+use crate::modules::types::{MicrophoneState, Settings};
+use std::sync::Mutex;
+
+// In a real app, you would use a proper settings storage like a config file or database
+// For now, we'll use a simple in-memory storage
+static SETTINGS: Mutex<Settings> = Mutex::new(Settings { telemetry_enabled: false });
 
 #[tauri::command]
 pub fn get_microphone_state() -> Result<MicrophoneState, String> {
@@ -35,4 +40,21 @@ pub fn set_microphone_mute(app: tauri::AppHandle, mute: bool) -> Result<Micropho
     emit_state_change(&app, &new_state);
     
     Ok(new_state)
+}
+
+#[tauri::command]
+pub fn get_settings() -> Result<Settings, String> {
+    SETTINGS.lock()
+        .map(|settings| settings.clone())
+        .map_err(|e| format!("Failed to get settings: {}", e))
+}
+
+#[tauri::command]
+pub fn set_telemetry_enabled(enabled: bool) -> Result<(), String> {
+    SETTINGS.lock()
+        .map(|mut settings| {
+            settings.telemetry_enabled = enabled;
+            println!("Telemetry {}", if enabled { "enabled" } else { "disabled" });
+        })
+        .map_err(|e| format!("Failed to set telemetry setting: {}", e))
 }

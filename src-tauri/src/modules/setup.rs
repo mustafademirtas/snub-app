@@ -2,7 +2,7 @@ use crate::modules::audio::macos_audio;
 use crate::modules::errors::log_error;
 use crate::modules::menu;
 use crate::modules::tray;
-use crate::modules::types::{MicrophoneState, TRAY_ID, MAIN_WINDOW_ID};
+use crate::modules::types::{MicrophoneState, TRAY_ID, MAIN_WINDOW_ID, SETTINGS_WINDOW_ID};
 use tauri::{tray::TrayIconBuilder, Manager};
 
 /// Sets up the system tray
@@ -33,6 +33,7 @@ pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
 /// Sets up window event handlers
 pub fn setup_window_handlers(app: &tauri::App) {
+    // Setup main window handlers
     if let Some(main_window) = app.get_webview_window(MAIN_WINDOW_ID) {
         let main_window_clone = main_window.clone();
         let _ = main_window.on_window_event(move |event| {
@@ -40,6 +41,18 @@ pub fn setup_window_handlers(app: &tauri::App) {
                 // Prevent the window from closing and hide it instead
                 api.prevent_close();
                 let _ = main_window_clone.hide();
+            }
+        });
+    }
+
+    // Setup settings window handlers
+    if let Some(settings_window) = app.get_webview_window(SETTINGS_WINDOW_ID) {
+        let settings_window_clone = settings_window.clone();
+        let _ = settings_window.on_window_event(move |event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                // Prevent the window from closing and hide it instead
+                api.prevent_close();
+                let _ = settings_window_clone.hide();
             }
         });
     }
