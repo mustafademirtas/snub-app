@@ -124,6 +124,48 @@ body {
   background: var(--color-background-solid);
 }
 
+.settings-page {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: default;
+}
+
+/* Prevent text cursor on all text elements except draggable header */
+.settings-page h1,
+.settings-page h2,
+.settings-page h3,
+.settings-page p,
+.settings-page span,
+.settings-page label,
+.settings-page div {
+  cursor: default;
+}
+
+/* Header should show draggable cursor */
+.settings-page .settings-header--draggable,
+.settings-page .settings-header--draggable * {
+  cursor: move;
+}
+
+/* Allow selection on input elements */
+.settings-page input,
+.settings-page textarea,
+.settings-page [contenteditable="true"] {
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+}
+
+/* Restore proper cursors for interactive elements */
+.settings-page button,
+.settings-page .toggle-switch,
+.settings-page .close-btn {
+  cursor: pointer;
+}
+
 .app--draggable {
   cursor: move;
 }
@@ -291,6 +333,10 @@ body:hover .close-btn {
   justify-content: flex-start;
   align-items: stretch;
   text-align: left;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* ==========================================================================
