@@ -88,7 +88,7 @@ async function handleDragStart(event: MouseEvent): Promise<void> {
   
   // Only start dragging if we're clicking on the header and not on the close button
   if (!isCloseButton && target.closest('.settings-header')) {
-    console.log('Starting drag from header');
+    // Debug: Starting drag from header
     try {
       await appWindow.startDragging();
     } catch (error) {
