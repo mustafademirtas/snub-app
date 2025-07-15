@@ -8,5 +8,6 @@ pub mod commands;
 pub mod errors;
 pub mod menu;
 pub mod setup;
+pub mod sound;
 pub mod tray;
 pub mod types;
