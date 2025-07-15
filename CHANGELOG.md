@@ -5,6 +5,34 @@ All notable changes to Snub will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-07-16
+
+### Added
+- **Audio Feedback**
+  - Sound playback when toggling microphone mute/unmute
+  - Uses native macOS system sounds (`Tink`, `Pop`, `Morse`) for audible feedback
+  - Graceful fallback system if preferred sounds are unavailable
+  - Silent operation on non-macOS platforms
+
+- **Settings Infrastructure**
+  - Basic settings system with telemetry control
+  - Settings window with modern UI matching main application design
+  - Persistent settings storage (in-memory for now, expandable to file-based)
+  - Settings accessible from system tray menu
+
+### Technical Improvements
+- **Sound Module**: New `macos_sound` module for system sound playback
+- **Settings Module**: Foundation for future configuration options
+- **Command Extensions**: Added `get_settings` and `set_telemetry_enabled` commands
+- **Error Handling**: Improved error handling for audio playback operations
+
+### User Experience
+- **Enhanced Feedback**: Users now receive audio confirmation when toggling microphone
+- **Accessibility**: Audio cues complement visual feedback for better user experience
+- **Settings Access**: Convenient access to application settings from tray menu
+
+---
+
 ## [1.0.0] - 2025-07-13
 
 ### Added
@@ -65,6 +93,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Release Notes
+
+### v1.1.0 - Audio Feedback Update
+
+This release introduces audio feedback to enhance the user experience when toggling the microphone. The app now plays subtle system sounds to confirm mute/unmute actions, providing both visual and auditory feedback.
+
+**New Features:**
+- 🔊 Audio feedback for microphone toggle actions
+- ⚙️ Settings window with telemetry controls
+- 🎵 Native macOS system sound integration
+- 🔧 Expandable settings infrastructure
+
+**Technical Enhancements:**
+- New sound playback module with graceful fallbacks
+- Settings system foundation for future configuration options
+- Enhanced error handling for audio operations
+- Cross-platform compatibility maintained
+
+**User Benefits:**
+- Immediate audio confirmation of microphone state changes
+- Better accessibility with multi-sensory feedback
+- Preparation for future customization options
+
+---
 
 ### v1.0.0 - Initial Release
 

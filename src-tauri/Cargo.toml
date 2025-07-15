@@ -1,6 +1,6 @@
 [package]
 name = "snub"
-version = "1.0.0"
+version = "1.1.0"
 description = "A macOS utility app for quick microphone toggle with system tray integration"
 authors = ["Mustafa Demirtas"]
 edition = "2021"
