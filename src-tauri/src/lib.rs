@@ -22,7 +22,7 @@
 
 mod modules;
 
-use modules::commands::{get_microphone_state, set_microphone_mute, toggle_microphone};
+use modules::commands::{get_microphone_state, set_microphone_mute, toggle_microphone, get_settings, set_telemetry_enabled};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -40,7 +40,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_microphone_state,
             toggle_microphone,
-            set_microphone_mute
+            set_microphone_mute,
+            get_settings,
+            set_telemetry_enabled
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

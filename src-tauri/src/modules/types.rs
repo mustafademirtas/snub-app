@@ -5,10 +5,12 @@ pub const DEFAULT_UNMUTED_VOLUME: &str = "50";
 pub const MUTED_VOLUME: &str = "0";
 pub const TRAY_ID: &str = "main";
 pub const MAIN_WINDOW_ID: &str = "main";
+pub const SETTINGS_WINDOW_ID: &str = "settings";
 
 // Menu item IDs
 pub const MENU_TOGGLE_MIC: &str = "toggle_microphone";
 pub const MENU_SHOW_WINDOW: &str = "show_window";
+pub const MENU_SETTINGS: &str = "settings";
 pub const MENU_QUIT: &str = "quit";
 
 // Tray tooltips
@@ -32,5 +34,31 @@ impl MicrophoneState {
     
     pub fn unmuted() -> Self {
         Self { is_muted: false }
+    }
+}
+
+/// Represents the application settings
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Settings {
+    pub telemetry_enabled: bool,
+}
+
+impl Settings {
+    pub fn new() -> Self {
+        Self {
+            telemetry_enabled: false,
+        }
+    }
+    
+    pub fn with_telemetry(telemetry_enabled: bool) -> Self {
+        Self {
+            telemetry_enabled,
+        }
+    }
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self::new()
     }
 }

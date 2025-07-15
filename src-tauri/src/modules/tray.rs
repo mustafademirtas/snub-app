@@ -1,4 +1,4 @@
-use crate::modules::types::{TRAY_ID, MENU_TOGGLE_MIC, MENU_SHOW_WINDOW, MENU_QUIT, TOOLTIP_MUTED, TOOLTIP_ACTIVE};
+use crate::modules::types::{TRAY_ID, MENU_TOGGLE_MIC, MENU_SHOW_WINDOW, MENU_SETTINGS, MENU_QUIT, TOOLTIP_MUTED, TOOLTIP_ACTIVE};
 use std::error::Error;
 use tauri::{
     menu::{Menu, MenuItem},
@@ -39,11 +39,13 @@ pub fn create_menu<R: Runtime>(app: &tauri::AppHandle<R>, is_muted: bool) -> Res
     
     let toggle_item = MenuItem::with_id(app, MENU_TOGGLE_MIC, menu_text, true, None::<&str>)?;
     let show_item = MenuItem::with_id(app, MENU_SHOW_WINDOW, "Show Window", true, None::<&str>)?;
+    let settings_item = MenuItem::with_id(app, MENU_SETTINGS, "Settings", true, None::<&str>)?;
     let quit_item = MenuItem::with_id(app, MENU_QUIT, "Quit", true, None::<&str>)?;
     
     let menu = Menu::new(app)?;
     menu.append(&toggle_item)?;
     menu.append(&show_item)?;
+    menu.append(&settings_item)?;
     menu.append(&quit_item)?;
     
     Ok(menu)

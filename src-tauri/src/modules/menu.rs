@@ -1,7 +1,7 @@
 use crate::modules::audio::macos_audio;
 use crate::modules::errors::log_error;
 use crate::modules::tray;
-use crate::modules::types::{MENU_TOGGLE_MIC, MENU_SHOW_WINDOW, MENU_QUIT, MAIN_WINDOW_ID, MicrophoneState};
+use crate::modules::types::{MENU_TOGGLE_MIC, MENU_SHOW_WINDOW, MENU_SETTINGS, MENU_QUIT, MAIN_WINDOW_ID, SETTINGS_WINDOW_ID, MicrophoneState};
 use tauri::{Emitter, Manager, Runtime};
 
 /// Emits microphone state change event to the frontend
@@ -16,6 +16,7 @@ pub fn handle_menu_event(app: &tauri::AppHandle, event_id: &str) {
     match event_id {
         MENU_TOGGLE_MIC => handle_toggle_microphone(app),
         MENU_SHOW_WINDOW => handle_show_window(app),
+        MENU_SETTINGS => handle_show_settings(app),
         MENU_QUIT => app.exit(0),
         _ => {}
     }
@@ -42,6 +43,14 @@ fn handle_toggle_microphone(app: &tauri::AppHandle) {
 /// Handles show window request
 fn handle_show_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window(MAIN_WINDOW_ID) {
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
+/// Handles show settings request
+fn handle_show_settings(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window(SETTINGS_WINDOW_ID) {
         let _ = window.show();
         let _ = window.set_focus();
     }
