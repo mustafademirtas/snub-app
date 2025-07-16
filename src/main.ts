@@ -1,6 +1,6 @@
 /**
  * Snub - macOS Microphone Control Application Frontend
- * 
+ *
  * This module handles the frontend UI for the Snub application, providing
  * a simple interface to control microphone state with visual feedback.
  */
@@ -8,11 +8,12 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { debounce } from "./utilities/debounce";
 
 // Constants for better maintainability
 const ELEMENT_IDS = {
   MIC_TOGGLE: "#mic-toggle",
-  MIC_ICON: "#mic-icon", 
+  MIC_ICON: "#mic-icon",
   MIC_OFF_ICON: "#mic-off-icon",
   CLOSE_BUTTON: "#close-button",
   DRAGGABLE_AREA: "#draggable-area",
@@ -58,6 +59,7 @@ class MicrophoneApp {
   private elements: AppElements | null = null;
   private unlisten: UnlistenFn | null = null;
   private readonly appWindow = getCurrentWindow();
+  private debouncedToggle!: () => void;
 
   /**
    * Initialize the application
@@ -65,12 +67,20 @@ class MicrophoneApp {
   public async initialize(): Promise<void> {
     try {
       this.elements = this.getRequiredElements();
+      this.setupDebouncing();
       this.setupEventListeners();
       await this.setupTauriEventListener();
       await this.loadInitialState();
     } catch (error) {
       console.error("Failed to initialize application:", error);
     }
+  }
+
+  /**
+   * Setup debounced methods
+   */
+  private setupDebouncing(): void {
+    this.debouncedToggle = debounce(this.performMicrophoneToggle.bind(this), 1000);
   }
 
   /**
@@ -87,12 +97,22 @@ class MicrophoneApp {
    */
   private getRequiredElements(): AppElements {
     const elements = {
-      micButton: document.querySelector(ELEMENT_IDS.MIC_TOGGLE) as HTMLButtonElement,
+      micButton: document.querySelector(
+        ELEMENT_IDS.MIC_TOGGLE
+      ) as HTMLButtonElement,
       micIcon: document.querySelector(ELEMENT_IDS.MIC_ICON) as HTMLElement,
-      micOffIcon: document.querySelector(ELEMENT_IDS.MIC_OFF_ICON) as HTMLElement,
-      closeButton: document.querySelector(ELEMENT_IDS.CLOSE_BUTTON) as HTMLElement,
-      draggableArea: document.querySelector(ELEMENT_IDS.DRAGGABLE_AREA) as HTMLElement,
-      statusDescription: document.querySelector(ELEMENT_IDS.MIC_STATUS_DESCRIPTION) as HTMLElement,
+      micOffIcon: document.querySelector(
+        ELEMENT_IDS.MIC_OFF_ICON
+      ) as HTMLElement,
+      closeButton: document.querySelector(
+        ELEMENT_IDS.CLOSE_BUTTON
+      ) as HTMLElement,
+      draggableArea: document.querySelector(
+        ELEMENT_IDS.DRAGGABLE_AREA
+      ) as HTMLElement,
+      statusDescription: document.querySelector(
+        ELEMENT_IDS.MIC_STATUS_DESCRIPTION
+      ) as HTMLElement,
     };
 
     // Validate all elements exist
@@ -101,7 +121,9 @@ class MicrophoneApp {
       .map(([name]) => name);
 
     if (missingElements.length > 0) {
-      throw new Error(`Missing required elements: ${missingElements.join(', ')}`);
+      throw new Error(
+        `Missing required elements: ${missingElements.join(", ")}`
+      );
     }
 
     console.log("All required elements found:", {
@@ -123,16 +145,24 @@ class MicrophoneApp {
     if (!this.elements) return;
 
     // Microphone toggle functionality
-    this.elements.micButton.addEventListener("click", () => this.handleMicrophoneToggle());
+    this.elements.micButton.addEventListener("click", () => {
+      this.handleMicrophoneToggle(); // Call synchronously, do not await
+    });
 
     // Window close functionality
-    this.elements.closeButton.addEventListener("click", (e) => this.handleCloseWindow(e));
+    this.elements.closeButton.addEventListener("click", (e) => {
+      this.handleCloseWindow(e);
+    });
 
     // Window dragging functionality
-    this.elements.draggableArea.addEventListener("mousedown", (e) => this.handleDragStart(e));
+    this.elements.draggableArea.addEventListener("mousedown", (e) => {
+      this.handleDragStart(e);
+    });
 
     // Keyboard shortcuts
-    document.addEventListener("keydown", (e) => this.handleKeyboardShortcuts(e));
+    document.addEventListener("keydown", (e) => {
+      this.handleKeyboardShortcuts(e);
+    });
   }
 
   /**
@@ -165,20 +195,20 @@ class MicrophoneApp {
       micButton.classList.add(CSS_CLASSES.MUTED);
       micIcon.classList.add(CSS_CLASSES.HIDDEN);
       micOffIcon.classList.remove(CSS_CLASSES.HIDDEN);
-      
+
       // Update accessibility attributes
-      micButton.setAttribute('aria-label', 'Unmute microphone');
-      micButton.setAttribute('title', 'Unmute microphone (Space)');
-      statusDescription.textContent = 'Microphone is now muted';
+      micButton.setAttribute("aria-label", "Unmute microphone");
+      micButton.setAttribute("title", "Unmute microphone (Space)");
+      statusDescription.textContent = "Microphone is now muted";
     } else {
       micButton.classList.remove(CSS_CLASSES.MUTED);
       micIcon.classList.remove(CSS_CLASSES.HIDDEN);
       micOffIcon.classList.add(CSS_CLASSES.HIDDEN);
-      
+
       // Update accessibility attributes
-      micButton.setAttribute('aria-label', 'Mute microphone');
-      micButton.setAttribute('title', 'Mute microphone (Space)');
-      statusDescription.textContent = 'Microphone is now active';
+      micButton.setAttribute("aria-label", "Mute microphone");
+      micButton.setAttribute("title", "Mute microphone (Space)");
+      statusDescription.textContent = "Microphone is now active";
     }
   }
 
@@ -187,7 +217,9 @@ class MicrophoneApp {
    */
   private async getMicrophoneState(): Promise<boolean> {
     try {
-      const state: MicrophoneState = await invoke(TAURI_COMMANDS.GET_MICROPHONE_STATE);
+      const state: MicrophoneState = await invoke(
+        TAURI_COMMANDS.GET_MICROPHONE_STATE
+      );
       return state.is_muted;
     } catch (error) {
       console.error("Failed to get microphone state:", error);
@@ -196,15 +228,34 @@ class MicrophoneApp {
   }
 
   /**
-   * Toggle microphone mute state
+   * Toggle microphone mute state (debounced)
    */
-  private async handleMicrophoneToggle(): Promise<void> {
-    try {
-      const newState: MicrophoneState = await invoke(TAURI_COMMANDS.TOGGLE_MICROPHONE);
-      this.updateMicrophoneUI(newState.is_muted);
-    } catch (error) {
-      console.error("Failed to toggle microphone:", error);
+  private handleMicrophoneToggle(): void {
+    this.debouncedToggle();
+  }
+
+  /**
+   * Perform the actual microphone toggle operation
+   */
+  private performMicrophoneToggle(): void {
+    console.log("Toggling microphone state");
+    if (!this.elements) {
+      console.error("App elements not found.");
+      return;
     }
+    // Get current state from UI
+    const isCurrentlyMuted = this.elements.micIcon.classList.contains(
+      CSS_CLASSES.HIDDEN
+    );
+    // Optimistically update UI to toggled state
+    this.updateMicrophoneUI(!isCurrentlyMuted);
+
+    // Non-blocking invoke
+    invoke(TAURI_COMMANDS.TOGGLE_MICROPHONE).catch((error) => {
+      // Revert UI if backend fails
+      this.updateMicrophoneUI(isCurrentlyMuted);
+      console.error("Failed to toggle microphone:", error);
+    });
   }
 
   /**
@@ -214,7 +265,7 @@ class MicrophoneApp {
     event.preventDefault();
     event.stopPropagation();
     console.log("Close button clicked");
-    
+
     try {
       await this.appWindow.close();
     } catch (error) {
@@ -229,7 +280,7 @@ class MicrophoneApp {
     const target = event.target as HTMLElement;
     const isCloseButton = target.closest(ELEMENT_IDS.CLOSE_BUTTON);
     const isMicButton = target.closest(ELEMENT_IDS.MIC_TOGGLE);
-    
+
     // Only start dragging if we're not clicking on interactive elements
     if (!isCloseButton && !isMicButton) {
       console.log("Starting drag");
@@ -250,10 +301,10 @@ class MicrophoneApp {
           console.error("Failed to close window with Escape:", error);
         }
         break;
-        
+
       case KEYBOARD_SHORTCUTS.SPACE:
         event.preventDefault();
-        await this.handleMicrophoneToggle();
+        this.handleMicrophoneToggle(); // Do not await
         break;
     }
   }
@@ -267,10 +318,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     const app = new MicrophoneApp();
     await app.initialize();
-    
+
     // Store app instance globally for potential cleanup
     (window as any).microphoneApp = app;
-    
+
     console.log("Snub application initialized successfully");
   } catch (error) {
     console.error("Failed to initialize Snub application:", error);
