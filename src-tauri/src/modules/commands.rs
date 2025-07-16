@@ -16,29 +16,33 @@ pub fn get_microphone_state() -> Result<MicrophoneState, String> {
 }
 
 #[tauri::command]
-pub fn toggle_microphone(app: tauri::AppHandle) -> Result<MicrophoneState, String> {
-    // Get current state and toggle it
-    let current_state = macos_audio::get_microphone_state().map_err(|e| e.to_string())?;
-    let new_state = macos_audio::set_microphone_mute(!current_state.is_muted).map_err(|e| e.to_string())?;
-    
-    // Play sound based on new state
-    if new_state.is_muted {
-        if let Err(e) = macos_sound::play_mute_sound() {
-            log_error("Failed to play mute sound", e);
+pub async fn toggle_microphone(app: tauri::AppHandle) -> Result<MicrophoneState, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        // Get current state and toggle it
+        let current_state = macos_audio::get_microphone_state().map_err(|e| e.to_string())?;
+        let new_state = macos_audio::set_microphone_mute(!current_state.is_muted).map_err(|e| e.to_string())?;
+
+        // Play sound based on new state
+        if new_state.is_muted {
+            if let Err(e) = macos_sound::play_mute_sound() {
+                log_error("Failed to play mute sound", e);
+            }
+        } else {
+            if let Err(e) = macos_sound::play_unmute_sound() {
+                log_error("Failed to play unmute sound", e);
+            }
         }
-    } else {
-        if let Err(e) = macos_sound::play_unmute_sound() {
-            log_error("Failed to play unmute sound", e);
+
+        // Update tray and emit event
+        if let Err(e) = tray::update_tray_state(&app, new_state.is_muted) {
+            log_error("Failed to update tray state", e);
         }
-    }
-    
-    // Update tray and emit event
-    if let Err(e) = tray::update_tray_state(&app, new_state.is_muted) {
-        log_error("Failed to update tray state", e);
-    }
-    emit_state_change(&app, &new_state);
-    
-    Ok(new_state)
+        emit_state_change(&app, &new_state);
+
+        Ok(new_state)
+    })
+    .await
+    .map_err(|e| e.to_string())?
 }
 
 #[tauri::command]
